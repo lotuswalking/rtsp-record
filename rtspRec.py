@@ -7,6 +7,7 @@ import time
 # RTSP stream URL
 rtsp_url = "rtsp://admin:Ottawa2024@192.168.2.225/live/ch00_01"
 
+duration = 30  #视频录制时长
 # Generate the output filename with current date and time
 current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 output_filename = f"recording_{current_time}.mp4"
@@ -37,9 +38,9 @@ def capture_audio():
     output_audio_stream.rate = input_audio_stream.rate
     output_audio_stream.channels = input_audio_stream.channels
     output_audio_stream.format = 'fltp'
-    tart_time = time.time()
+    start_time = time.time()
     for frame in input_container.decode(input_audio_stream):
-        if time.time() - start_time > 30:
+        if time.time() - start_time > duration:
             break
         packet = output_audio_stream.encode(frame)
         container.mux(packet)
@@ -50,7 +51,7 @@ audio_thread.start()
 
 # Video capture loop
 start_time = time.time()
-while time.time() - start_time < 30:
+while time.time() - start_time < duration:
     ret, frame = cap.read()
     if not ret:
         break
